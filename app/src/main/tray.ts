@@ -76,44 +76,12 @@ function toggleWindow() {
 }
 
 export function createTray() {
-  // Create a 16x16 template icon for macOS menu bar
-  // Simple "T" shape icon encoded as base64 PNG
-  const iconBase64 = 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAOklEQVQ4T2NkYGD4z0ABYGRgYGCgxAAWBgYGhs+fP1PFgP///zOQawALAwMDw6dPn6hmwMePH6lmAAD2sAkR8C6t2wAAAABJRU5ErkJggg==';
-
-  let icon = nativeImage.createFromDataURL(`data:image/png;base64,${iconBase64}`);
-
-  // If icon creation failed, try loading from file
-  if (icon.isEmpty()) {
-    const iconPath = path.join(__dirname, '../../assets/tray-icon.png');
-    icon = nativeImage.createFromPath(iconPath);
-  }
-
-  // If still empty, create a simple colored square as fallback
-  if (icon.isEmpty()) {
-    const size = 16;
-    const canvas = Buffer.alloc(size * size * 4);
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        const i = (y * size + x) * 4;
-        // Create a simple "T" shape
-        const isT = (y < 4) || (x >= 6 && x <= 9);
-        if (isT) {
-          canvas[i] = 0;       // R (black for template)
-          canvas[i + 1] = 0;   // G
-          canvas[i + 2] = 0;   // B
-          canvas[i + 3] = 255; // A (fully opaque)
-        } else {
-          canvas[i + 3] = 0;   // Transparent
-        }
-      }
-    }
-    icon = nativeImage.createFromBuffer(canvas, { width: size, height: size });
-  }
-
-  // Set as template image for macOS (adapts to dark/light mode)
-  icon.setTemplateImage(true);
+  // Load icon from file
+  const iconPath = path.join(__dirname, '../../assets/tray-iconTemplate.png');
+  const icon = nativeImage.createFromPath(iconPath);
 
   tray = new Tray(icon);
+  tray.setTitle('T'); // Show "T" text in menu bar
   tray.setToolTip('Trode - Claude Code Monitor');
 
   tray.on('click', () => {
