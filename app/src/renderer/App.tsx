@@ -1,4 +1,30 @@
+import { useState, useEffect } from 'react';
+import { UsagePanel } from './components/UsagePanel';
+import { Footer } from './components/Footer';
+import { getUsageStats, UsageStats } from '../services/claudeUsage';
+
 function App() {
+  const [stats, setStats] = useState<UsageStats>(getUsageStats());
+  const [lastUpdated, setLastUpdated] = useState(0);
+
+  useEffect(() => {
+    // Update "last updated" counter every second
+    const interval = setInterval(() => {
+      setLastUpdated((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleRefresh = () => {
+    setStats(getUsageStats());
+    setLastUpdated(0);
+  };
+
+  const handleSettings = () => {
+    // Placeholder - no functionality yet
+  };
+
   const handleQuit = () => {
     window.electronAPI.quit();
   };
@@ -6,22 +32,20 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1 className="title">Trode</h1>
+        <h1 className="title">Claude Usage</h1>
         <span className="badge">Pro</span>
       </header>
 
       <main className="content">
-        <p className="placeholder">Claude Code usage monitor coming soon...</p>
+        <UsagePanel stats={stats} />
       </main>
 
-      <footer className="footer">
-        <button className="footer-btn" onClick={() => {}}>
-          Settings
-        </button>
-        <button className="footer-btn quit-btn" onClick={handleQuit}>
-          Quit
-        </button>
-      </footer>
+      <Footer
+        lastUpdated={lastUpdated}
+        onRefresh={handleRefresh}
+        onSettings={handleSettings}
+        onQuit={handleQuit}
+      />
     </div>
   );
 }
