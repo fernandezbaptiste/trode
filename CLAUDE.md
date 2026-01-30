@@ -13,7 +13,7 @@ A macOS menu bar app that tracks Claude Code usage AND shows skill evaluation sc
 - [x] Milestone 1: Scaffold Electron app
 - [x] Milestone 2: Usage Panel UI
 - [x] Milestone 3: Skills Scanner
-- [ ] Milestone 4: Tessl CLI Integration
+- [x] Milestone 4: Tessl CLI Integration
 - [ ] Milestone 5: Demo Project + Polish
 
 ## Current Task
