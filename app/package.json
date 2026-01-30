@@ -29,12 +29,21 @@
   "build": {
     "appId": "io.tessl.trode",
     "productName": "Trode",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
     "mac": {
       "target": "dmg",
       "category": "public.app-category.developer-tools"
     },
     "extraMetadata": {
+      "main": "dist/main/index.js",
       "LSUIElement": true
-    }
+    },
+    "extends": null
   }
 }

@@ -271,10 +271,35 @@ body {
 .skill-status {
   font-size: 11px;
   color: #666;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
 }
 
 .skill-status.no-eval {
   color: #666;
+}
+
+.skill-status.positive {
+  color: #4ade80;
+}
+
+.skill-status.warning {
+  color: #fbbf24;
+}
+
+.skill-status.negative {
+  color: #f87171;
+}
+
+.skill-badge.positive {
+  opacity: 1;
+}
+
+.skill-badge.warning {
+  opacity: 1;
+}
+
+.skill-badge.negative {
+  opacity: 1;
 }
 
 .no-skills {
@@ -282,6 +307,21 @@ body {
   color: #666;
   font-style: italic;
   padding: 8px 0;
+}
+
+.tessl-link {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: #a78bfa;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.tessl-link:hover {
+  color: #c4b5fd;
 }
 
 /* Scrollbar styling */

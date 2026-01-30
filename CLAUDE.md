@@ -14,7 +14,7 @@ A macOS menu bar app that tracks Claude Code usage AND shows skill evaluation sc
 - [x] Milestone 2: Usage Panel UI
 - [x] Milestone 3: Skills Scanner
 - [x] Milestone 4: Tessl CLI Integration
-- [ ] Milestone 5: Demo Project + Polish
+- [x] Milestone 5: Demo Project + Polish
 
 ## Current Task
 
