@@ -1,74 +1,60 @@
-# Task: Claude Usage Panel UI
+# Task: Skills Scanner
 
 ## Goal
 
-Implement the Claude usage display section with mock data. Focus on UI only.
+Scan and display installed skills from .claude/skills/ directories.
 
 ## Definition of Done
 
-- [ ] UsagePanel component shows 5-hour window with progress bar
-- [ ] UsagePanel component shows weekly limit with progress bar
-- [ ] "Today" section shows messages, tokens, and estimated cost
-- [ ] Progress bars have gradient fills (match Claude aesthetic)
-- [ ] Numbers use monospace font
-- [ ] Footer shows "Updated 0 sec ago" with refresh button (↻)
-- [ ] UI matches the mockup in prompt.md
-- [ ] All data comes from mock values in claudeUsage.ts
+- [ ] skillsScanner.ts finds skills in ~/.claude/skills/
+- [ ] skillsScanner.ts finds skills in $PROJECT/.claude/skills/
+- [ ] SkillsPanel.tsx lists skill name + source (project/global)
+- [ ] Shows "No skills found" if empty
+- [ ] SKILLS_PROJECT_PATH env var overrides project path
+- [ ] Skills show gray "no eval" badges (no scores yet)
+- [ ] Extracts first line of SKILL.md as description
 
 ## Files to Create/Modify
 
 ```
-app/src/renderer/components/
-├── UsagePanel.tsx
-├── ProgressBar.tsx
-└── Footer.tsx
-
 app/src/services/
-└── claudeUsage.ts  (mock data for now)
+└── skillsScanner.ts
+
+app/src/renderer/components/
+└── SkillsPanel.tsx
 ```
 
-## Mock Data to Use
+## Environment Variable Support
 
-```typescript
-{
-  fiveHourWindow: { percentage: 20, resetsIn: '4h 54m' },
-  weekly: { percentage: 51, resetsAt: 'Mon 2:59 PM' },
-  today: { messages: 6, tokens: 753200, estimatedCost: 2.47 }
-}
+```bash
+# Use a specific project path for testing
+SKILLS_PROJECT_PATH=./demo-project npm start
 ```
 
 ## UI Reference
 
 ```
 ┌─────────────────────────────────────┐
-│  Claude Usage               Pro     │
-├─────────────────────────────────────┤
-│  ⏱ 5-Hour Window           20%     │
-│  ████░░░░░░░░░░░░░░░░░             │
-│  Resets in 4h 54m                   │
-├─────────────────────────────────────┤
-│  📅 Weekly                  51%     │
-│  ██████████░░░░░░░░░░░             │
-│  Resets Mon 2:59 PM                 │
-├─────────────────────────────────────┤
-│  📊 Today                           │
-│  Messages:                      6   │
-│  Tokens:                    753.2K  │
-│  Est. Cost:                 $2.47   │
+│  🧩 Skills Health    3 active       │
+│  ❓ vercel-react-best...   no eval  │
+│  ❓ frontend-design        no eval  │
+│  ❓ my-custom-skill        no eval  │
 └─────────────────────────────────────┘
 ```
 
 ## Constraints
 
-- **DO NOT** implement real ~/.claude/ parsing yet
-- **DO NOT** implement skills section yet
-- **DO NOT** implement Tessl integration yet
-- Settings button can be a placeholder (no functionality)
+- **DO NOT** implement Tessl eval scores yet (all gray badges)
+- **DO NOT** implement the onboarding/setup panel yet
+- **DO NOT** add colors yet (all skills are gray)
 
 ## Verification
 
 ```bash
+# Create a test skill
+mkdir -p ~/.claude/skills/test-skill
+echo "# Test Skill" > ~/.claude/skills/test-skill/SKILL.md
+
 cd app && npm start
-# Popover shows usage stats with progress bars
-# All values are hardcoded mock data
+# Should see "test-skill" in the skills list with gray badge
 ```
