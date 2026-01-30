@@ -1,58 +1,74 @@
-# Task: Scaffold Electron Menu Bar App
+# Task: Claude Usage Panel UI
 
 ## Goal
 
-Create a minimal Electron menu bar app with a React popover that shows placeholder text.
+Implement the Claude usage display section with mock data. Focus on UI only.
 
 ## Definition of Done
 
-- [ ] Running `npm start` from `app/` directory launches the app
-- [ ] Menu bar shows a tray icon (can use placeholder icon)
-- [ ] Clicking tray icon opens a 320px wide popover window
-- [ ] Popover has dark theme background (#1a1a1a)
-- [ ] Popover shows "Trode" title text
-- [ ] No dock icon appears (LSUIElement configured)
-- [ ] "Quit" button closes the app cleanly
-- [ ] No TypeScript or build errors
+- [ ] UsagePanel component shows 5-hour window with progress bar
+- [ ] UsagePanel component shows weekly limit with progress bar
+- [ ] "Today" section shows messages, tokens, and estimated cost
+- [ ] Progress bars have gradient fills (match Claude aesthetic)
+- [ ] Numbers use monospace font
+- [ ] Footer shows "Updated 0 sec ago" with refresh button (↻)
+- [ ] UI matches the mockup in prompt.md
+- [ ] All data comes from mock values in claudeUsage.ts
 
-## Files to Create
+## Files to Create/Modify
 
 ```
-app/
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── electron-builder.json
-├── src/
-│   ├── main/
-│   │   ├── index.ts
-│   │   └── tray.ts
-│   ├── preload/
-│   │   └── index.ts
-│   └── renderer/
-│       ├── index.html
-│       ├── index.tsx
-│       ├── App.tsx
-│       └── styles.css
+app/src/renderer/components/
+├── UsagePanel.tsx
+├── ProgressBar.tsx
+└── Footer.tsx
+
+app/src/services/
+└── claudeUsage.ts  (mock data for now)
 ```
 
-## Technical Notes
+## Mock Data to Use
 
-- Use vite-plugin-electron for Electron + Vite integration
-- Reference https://github.com/Iamshankhadeep/ccseva for tray patterns
-- Popover should appear below/near the tray icon
-- Use BrowserWindow with frame: false
+```typescript
+{
+  fiveHourWindow: { percentage: 20, resetsIn: '4h 54m' },
+  weekly: { percentage: 51, resetsAt: 'Mon 2:59 PM' },
+  today: { messages: 6, tokens: 753200, estimatedCost: 2.47 }
+}
+```
+
+## UI Reference
+
+```
+┌─────────────────────────────────────┐
+│  Claude Usage               Pro     │
+├─────────────────────────────────────┤
+│  ⏱ 5-Hour Window           20%     │
+│  ████░░░░░░░░░░░░░░░░░             │
+│  Resets in 4h 54m                   │
+├─────────────────────────────────────┤
+│  📅 Weekly                  51%     │
+│  ██████████░░░░░░░░░░░             │
+│  Resets Mon 2:59 PM                 │
+├─────────────────────────────────────┤
+│  📊 Today                           │
+│  Messages:                      6   │
+│  Tokens:                    753.2K  │
+│  Est. Cost:                 $2.47   │
+└─────────────────────────────────────┘
+```
 
 ## Constraints
 
-- **DO NOT** implement usage tracking yet
-- **DO NOT** implement skills scanning yet
+- **DO NOT** implement real ~/.claude/ parsing yet
+- **DO NOT** implement skills section yet
 - **DO NOT** implement Tessl integration yet
-- Just get a working shell that opens and closes
+- Settings button can be a placeholder (no functionality)
 
 ## Verification
 
 ```bash
-cd app && npm install && npm start
-# Should see tray icon, click opens dark popover, quit works
+cd app && npm start
+# Popover shows usage stats with progress bars
+# All values are hardcoded mock data
 ```
