@@ -1,60 +1,87 @@
-# Task: Skills Scanner
+# Task: Tessl CLI Integration
 
 ## Goal
 
-Scan and display installed skills from .claude/skills/ directories.
+Integrate with Tessl CLI to show eval scores and handle onboarding.
 
 ## Definition of Done
 
-- [ ] skillsScanner.ts finds skills in ~/.claude/skills/
-- [ ] skillsScanner.ts finds skills in $PROJECT/.claude/skills/
-- [ ] SkillsPanel.tsx lists skill name + source (project/global)
-- [ ] Shows "No skills found" if empty
-- [ ] SKILLS_PROJECT_PATH env var overrides project path
-- [ ] Skills show gray "no eval" badges (no scores yet)
-- [ ] Extracts first line of SKILL.md as description
+- [ ] tesslCli.ts detects if tessl CLI is installed (`tessl --version`)
+- [ ] tesslCli.ts detects if user is authenticated (`tessl whoami`)
+- [ ] TesslSetup.tsx shows onboarding panel if CLI not configured
+- [ ] TesslSetup.tsx has "Run tessl login" button that triggers login
+- [ ] Skills are color-coded by lift value (green/yellow/red/gray)
+- [ ] "Free evals on tessl.io →" link opens in browser
+- [ ] Hardcoded eval scores work as fallback
 
 ## Files to Create/Modify
 
 ```
 app/src/services/
-└── skillsScanner.ts
+└── tesslCli.ts
 
 app/src/renderer/components/
-└── SkillsPanel.tsx
+├── TesslSetup.tsx      (new)
+└── SkillsPanel.tsx     (update for colors)
 ```
 
-## Environment Variable Support
+## Color Coding Rules
 
-```bash
-# Use a specific project path for testing
-SKILLS_PROJECT_PATH=./demo-project npm start
+| Icon | Condition | Color |
+|------|-----------|-------|
+| ✅ | lift >= +5 | Green |
+| ⚠️ | lift 0 to +5 | Yellow |
+| ❌ | lift < 0 | Red |
+| ❓ | no eval data | Gray |
+
+## Hardcoded Eval Scores
+
+```typescript
+const KNOWN_EVAL_SCORES = {
+  'agent-browser': { score: 71, lift: 42.5 },
+  'remotion-best-practices': { score: 100, lift: 25.5 },
+  'remotion': { score: 100, lift: 25.5 },
+  'frontend-design': { score: 90.3, lift: 24.6 },
+  'vercel-react-best-practices': { score: 78.5, lift: 16.5 },
+  'karpathy-guidelines': { score: 88.3, lift: -3.5 }, // NEGATIVE!
+};
 ```
 
-## UI Reference
+## TesslSetup Panel UI
 
 ```
 ┌─────────────────────────────────────┐
-│  🧩 Skills Health    3 active       │
-│  ❓ vercel-react-best...   no eval  │
-│  ❓ frontend-design        no eval  │
-│  ❓ my-custom-skill        no eval  │
+│  🔧 Setup Required                  │
+│                                     │
+│  To see skill eval scores, install  │
+│  the Tessl CLI:                     │
+│                                     │
+│  npm install -g @tessl/cli          │
+│                                     │
+│  Then authenticate:                 │
+│                                     │
+│  [Run tessl login]  ← button        │
+│                                     │
+│  📖 View docs at docs.tessl.io      │
 └─────────────────────────────────────┘
 ```
 
 ## Constraints
 
-- **DO NOT** implement Tessl eval scores yet (all gray badges)
-- **DO NOT** implement the onboarding/setup panel yet
-- **DO NOT** add colors yet (all skills are gray)
+- Shell out to tessl CLI (don't use API directly)
+- Use hardcoded scores as primary source (CLI may not return eval data)
+- Don't block the app if tessl is missing - show setup panel instead
 
 ## Verification
 
 ```bash
-# Create a test skill
-mkdir -p ~/.claude/skills/test-skill
-echo "# Test Skill" > ~/.claude/skills/test-skill/SKILL.md
-
+# Test 1: Without tessl installed
 cd app && npm start
-# Should see "test-skill" in the skills list with gray badge
+# Should see TesslSetup onboarding panel
+
+# Test 2: With tessl installed and logged in
+npm install -g @tessl/cli
+tessl login
+cd app && npm start
+# Should see skills with colored eval scores
 ```

@@ -277,11 +277,136 @@ body {
   color: #666;
 }
 
+/* Eval color coding */
+.skill-badge.eval-positive,
+.skill-status.eval-positive {
+  color: #22c55e;
+}
+
+.skill-badge.eval-neutral,
+.skill-status.eval-neutral {
+  color: #eab308;
+}
+
+.skill-badge.eval-negative,
+.skill-status.eval-negative {
+  color: #ef4444;
+}
+
 .no-skills {
   font-size: 12px;
   color: #666;
   font-style: italic;
   padding: 8px 0;
+}
+
+/* Tessl link */
+.tessl-link {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  background: none;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #a78bfa;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.tessl-link:hover {
+  background-color: rgba(167, 139, 250, 0.1);
+  border-color: #a78bfa;
+}
+
+/* Tessl Setup Panel */
+.tessl-setup {
+  padding: 12px 0;
+  border-top: 1px solid #333;
+}
+
+.setup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.setup-icon {
+  font-size: 14px;
+}
+
+.setup-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.setup-content {
+  padding: 0 4px;
+}
+
+.setup-text {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.setup-command {
+  display: block;
+  background-color: #252525;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 11px;
+  color: #a78bfa;
+  margin-bottom: 12px;
+}
+
+.setup-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #a78bfa;
+  border: none;
+  border-radius: 4px;
+  color: #000;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.setup-btn:hover {
+  background-color: #c4b5fd;
+}
+
+.setup-hint {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
+}
+
+.setup-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+}
+
+.docs-link {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.docs-link:hover {
+  color: #a78bfa;
 }
 
 /* Scrollbar styling */
