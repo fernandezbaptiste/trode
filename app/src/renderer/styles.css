@@ -206,6 +206,84 @@ body {
   color: #ef4444;
 }
 
+/* Skills Panel */
+.skills-panel {
+  padding: 12px 0;
+  border-top: 1px solid #333;
+}
+
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.skills-title {
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skills-icon {
+  font-size: 12px;
+}
+
+.skills-count {
+  font-size: 11px;
+  color: #666;
+}
+
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.skill-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skill-badge {
+  font-size: 12px;
+}
+
+.skill-badge.no-eval {
+  opacity: 0.5;
+}
+
+.skill-name {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.skill-status {
+  font-size: 11px;
+  color: #666;
+}
+
+.skill-status.no-eval {
+  color: #666;
+}
+
+.no-skills {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+  padding: 8px 0;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;

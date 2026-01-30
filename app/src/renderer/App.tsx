@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
 import { UsagePanel } from './components/UsagePanel';
+import { SkillsPanel } from './components/SkillsPanel';
 import { Footer } from './components/Footer';
 import { getUsageStats, UsageStats } from '../services/claudeUsage';
+import { InstalledSkill } from '../services/skillsScanner';
 
 function App() {
   const [stats, setStats] = useState<UsageStats>(getUsageStats());
+  const [skills, setSkills] = useState<InstalledSkill[]>([]);
   const [lastUpdated, setLastUpdated] = useState(0);
 
   useEffect(() => {
+    // Load skills on mount
+    window.electronAPI.scanSkills().then(setSkills);
+
     // Update "last updated" counter every second
     const interval = setInterval(() => {
       setLastUpdated((prev) => prev + 1);
@@ -18,6 +24,7 @@ function App() {
 
   const handleRefresh = () => {
     setStats(getUsageStats());
+    window.electronAPI.scanSkills().then(setSkills);
     setLastUpdated(0);
   };
 
@@ -38,6 +45,7 @@ function App() {
 
       <main className="content">
         <UsagePanel stats={stats} />
+        <SkillsPanel skills={skills} />
       </main>
 
       <Footer
