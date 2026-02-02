@@ -1,88 +1,100 @@
+import { useState, useEffect } from 'react';
 import { InstalledSkill } from '../../services/skillsScanner';
-import { SkillEval } from '../../services/tesslCli';
 
 interface SkillsPanelProps {
   skills: InstalledSkill[];
-  evals: Record<string, SkillEval>;
-  onOpenTessl: () => void;
 }
 
-export function SkillsPanel({ skills, evals, onOpenTessl }: SkillsPanelProps) {
+interface SkillEval {
+  skillName: string;
+  reviewScore: number | null;
+  hasEval: boolean;
+  source: string | null;
+}
+
+function getScoreClass(score: number | null): string {
+  if (score === null) return 'no-eval';
+  if (score >= 70) return 'high';
+  if (score >= 50) return 'mid';
+  return 'low';
+}
+
+function formatScore(score: number | null): string {
+  if (score === null) return '—';
+  return `${Math.round(score)}%`;
+}
+
+export function SkillsPanel({ skills }: SkillsPanelProps) {
+  const [evals, setEvals] = useState<Record<string, SkillEval>>({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (skills.length === 0) return;
+
+    setLoading(true);
+    const skillNames = skills.map((s) => s.name);
+
+    window.electronAPI
+      .fetchSkillEvals(skillNames)
+      .then((result) => {
+        setEvals(result);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch evals:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [skills]);
+
+  const openTesslRegistry = () => {
+    window.open('https://tessl.io/registry', '_blank');
+  };
+
+  const openSkillPage = (skillName: string) => {
+    window.open(`https://tessl.io/registry?q=${encodeURIComponent(skillName)}`, '_blank');
+  };
+
   return (
     <div className="skills-panel">
       <div className="skills-header">
-        <span className="skills-title">
-          <span className="skills-icon">&#x1F9E9;</span> Skills Health
-        </span>
-        <span className="skills-count">{skills.length} active</span>
+        <div className="skills-title-row">
+          <span className="skills-label">SKILLS</span>
+          <span className="skills-count">{skills.length}</span>
+        </div>
+        {loading && <span className="skills-loading">syncing...</span>}
       </div>
 
-      <div className="skills-list">
+      <div className="skills-grid">
         {skills.length === 0 ? (
-          <div className="no-skills">No skills found</div>
+          <div className="no-skills">No skills installed</div>
         ) : (
           skills.map((skill) => {
             const evalData = evals[skill.name];
-            const { icon, className, statusText } = getSkillDisplay(evalData);
+            const score = evalData?.reviewScore ?? null;
+            const scoreClass = getScoreClass(score);
 
             return (
-              <div key={skill.path} className="skill-item">
-                <div className="skill-info">
-                  <span className={`skill-badge ${className}`}>{icon}</span>
-                  <span className="skill-name" title={skill.name}>
-                    {truncateName(skill.name)}
-                  </span>
-                </div>
-                <span className={`skill-status ${className}`}>{statusText}</span>
+              <div
+                key={skill.path}
+                className={`skill-chip ${scoreClass}`}
+                onClick={() => openSkillPage(skill.name)}
+                title={`${skill.name}${score !== null ? ` • ${score}% review score` : ' • No eval'}`}
+              >
+                <span className="skill-chip-name">{skill.name}</span>
+                <span className={`skill-chip-score ${scoreClass}`}>
+                  {formatScore(score)}
+                </span>
               </div>
             );
           })
         )}
       </div>
 
-      <button className="tessl-link" onClick={onOpenTessl}>
-        Free evals on tessl.io &rarr;
-      </button>
+      <div className="tessl-cta" onClick={openTesslRegistry}>
+        <span className="tessl-cta-text">Get evals on tessl.io</span>
+        <span className="tessl-cta-arrow">→</span>
+      </div>
     </div>
   );
-}
-
-function getSkillDisplay(evalData?: SkillEval): {
-  icon: string;
-  className: string;
-  statusText: string;
-} {
-  if (!evalData || !evalData.hasEval) {
-    return { icon: '\u2753', className: 'no-eval', statusText: 'no eval' };
-  }
-
-  const lift = evalData.lift ?? 0;
-
-  if (lift < 0) {
-    // Red - negative lift
-    return {
-      icon: '\u274C',
-      className: 'eval-negative',
-      statusText: `${lift}`,
-    };
-  } else if (lift >= 5) {
-    // Green - lift >= 5
-    return {
-      icon: '\u2705',
-      className: 'eval-positive',
-      statusText: `+${lift}`,
-    };
-  } else {
-    // Yellow - lift 0 to 5
-    return {
-      icon: '\u26A0\uFE0F',
-      className: 'eval-neutral',
-      statusText: `+${lift}`,
-    };
-  }
-}
-
-function truncateName(name: string, maxLength: number = 20): string {
-  if (name.length <= maxLength) return name;
-  return name.slice(0, maxLength - 3) + '...';
 }

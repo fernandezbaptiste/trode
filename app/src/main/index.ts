@@ -1,7 +1,7 @@
-import { app, ipcMain, shell } from 'electron';
+import { app, ipcMain } from 'electron';
 import { createTray, getWindow } from './tray';
 import { scanForSkills, getProjectPath } from '../services/skillsScanner';
-import { checkTesslStatus, runTesslLogin, getSkillEvals } from '../services/tesslCli';
+import { fetchSkillEvals, clearEvalCache, SkillEval } from '../services/tesslService';
 
 // Handle IPC events
 ipcMain.on('quit-app', () => {
@@ -14,22 +14,20 @@ ipcMain.handle('scan-skills', () => {
   return scanForSkills(projectPath);
 });
 
-// Handle Tessl CLI
-ipcMain.handle('tessl-status', () => {
-  return checkTesslStatus();
+// Handle skill evaluations lookup
+ipcMain.handle('fetch-skill-evals', async (_event, skillNames: string[]) => {
+  const evalsMap = await fetchSkillEvals(skillNames);
+  // Convert Map to object for IPC serialization
+  const result: Record<string, SkillEval> = {};
+  evalsMap.forEach((value, key) => {
+    result[key] = value;
+  });
+  return result;
 });
 
-ipcMain.handle('tessl-login', () => {
-  return runTesslLogin();
-});
-
-ipcMain.handle('get-skill-evals', (_event, skillNames: string[]) => {
-  return getSkillEvals(skillNames);
-});
-
-// Open external URL
-ipcMain.on('open-external', (_event, url: string) => {
-  shell.openExternal(url);
+// Handle cache clear
+ipcMain.handle('clear-eval-cache', () => {
+  clearEvalCache();
 });
 
 // Hide dock icon on macOS

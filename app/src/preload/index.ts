@@ -8,30 +8,21 @@ interface InstalledSkill {
   source: 'project' | 'global';
 }
 
-// Type for Tessl status
-interface TesslStatus {
-  installed: boolean;
-  authenticated: boolean;
-  username?: string;
-}
-
-// Type for skill eval
+// Type for skill evaluation
 interface SkillEval {
   skillName: string;
-  score?: number;
-  lift?: number;
+  reviewScore: number | null;
   hasEval: boolean;
+  source: string | null;
 }
 
 // Expose protected methods to the renderer process
 contextBridge.exposeInMainWorld('electronAPI', {
   quit: () => ipcRenderer.send('quit-app'),
   scanSkills: (): Promise<InstalledSkill[]> => ipcRenderer.invoke('scan-skills'),
-  getTesslStatus: (): Promise<TesslStatus> => ipcRenderer.invoke('tessl-status'),
-  runTesslLogin: (): Promise<boolean> => ipcRenderer.invoke('tessl-login'),
-  getSkillEvals: (skillNames: string[]): Promise<Record<string, SkillEval>> =>
-    ipcRenderer.invoke('get-skill-evals', skillNames),
-  openExternal: (url: string) => ipcRenderer.send('open-external', url),
+  fetchSkillEvals: (skillNames: string[]): Promise<Record<string, SkillEval>> =>
+    ipcRenderer.invoke('fetch-skill-evals', skillNames),
+  clearEvalCache: (): Promise<void> => ipcRenderer.invoke('clear-eval-cache'),
 });
 
 // Type definitions for the exposed API
@@ -40,10 +31,8 @@ declare global {
     electronAPI: {
       quit: () => void;
       scanSkills: () => Promise<InstalledSkill[]>;
-      getTesslStatus: () => Promise<TesslStatus>;
-      runTesslLogin: () => Promise<boolean>;
-      getSkillEvals: (skillNames: string[]) => Promise<Record<string, SkillEval>>;
-      openExternal: (url: string) => void;
+      fetchSkillEvals: (skillNames: string[]) => Promise<Record<string, SkillEval>>;
+      clearEvalCache: () => Promise<void>;
     };
   }
 }
