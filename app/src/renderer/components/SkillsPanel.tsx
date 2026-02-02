@@ -1,79 +1,89 @@
+import { useState, useEffect } from 'react';
 import { InstalledSkill } from '../../services/skillsScanner';
 
 interface SkillsPanelProps {
   skills: InstalledSkill[];
 }
 
-// Hardcoded eval scores from Tessl research
-const KNOWN_EVAL_SCORES: Record<string, { score: number; lift: number }> = {
-  'agent-browser': { score: 71, lift: 42.5 },
-  'remotion-best-practices': { score: 100, lift: 25.5 },
-  'remotion': { score: 100, lift: 25.5 },
-  'frontend-design': { score: 90.3, lift: 24.6 },
-  'vercel-react-best-practices': { score: 78.5, lift: 16.5 },
-  'karpathy-guidelines': { score: 88.3, lift: -3.5 },
-};
-
 interface SkillEval {
+  skillName: string;
+  reviewScore: number | null;
   hasEval: boolean;
-  lift?: number;
-  icon: string;
-  className: string;
+  source: string | null;
 }
 
-function getSkillEval(skillName: string): SkillEval {
-  const known = KNOWN_EVAL_SCORES[skillName];
-  if (!known) {
-    return { hasEval: false, icon: '\u2753', className: 'no-eval' };
-  }
-
-  const { lift } = known;
-  if (lift < 0) {
-    return { hasEval: true, lift, icon: '\u274C', className: 'negative' };
-  }
-  if (lift < 5) {
-    return { hasEval: true, lift, icon: '\u26A0\uFE0F', className: 'warning' };
-  }
-  return { hasEval: true, lift, icon: '\u2705', className: 'positive' };
+function getScoreClass(score: number | null): string {
+  if (score === null) return 'no-eval';
+  if (score >= 70) return 'high';
+  if (score >= 50) return 'mid';
+  return 'low';
 }
 
-function formatLift(lift: number): string {
-  const sign = lift >= 0 ? '+' : '';
-  return `${sign}${lift}`;
+function formatScore(score: number | null): string {
+  if (score === null) return '—';
+  return `${Math.round(score)}%`;
 }
 
 export function SkillsPanel({ skills }: SkillsPanelProps) {
+  const [evals, setEvals] = useState<Record<string, SkillEval>>({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (skills.length === 0) return;
+
+    setLoading(true);
+    const skillNames = skills.map((s) => s.name);
+
+    window.electronAPI
+      .fetchSkillEvals(skillNames)
+      .then((result) => {
+        setEvals(result);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch evals:', err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [skills]);
+
   const openTesslRegistry = () => {
     window.open('https://tessl.io/registry', '_blank');
+  };
+
+  const openSkillPage = (skillName: string) => {
+    window.open(`https://tessl.io/registry?q=${encodeURIComponent(skillName)}`, '_blank');
   };
 
   return (
     <div className="skills-panel">
       <div className="skills-header">
-        <span className="skills-title">
-          <span className="skills-icon">&#x1F9E9;</span> Skills Health
-        </span>
-        <span className="skills-count">{skills.length} active</span>
+        <div className="skills-title-row">
+          <span className="skills-label">SKILLS</span>
+          <span className="skills-count">{skills.length}</span>
+        </div>
+        {loading && <span className="skills-loading">syncing...</span>}
       </div>
 
-      <div className="skills-list">
+      <div className="skills-grid">
         {skills.length === 0 ? (
-          <div className="no-skills">No skills found</div>
+          <div className="no-skills">No skills installed</div>
         ) : (
           skills.map((skill) => {
-            const evalData = getSkillEval(skill.name);
+            const evalData = evals[skill.name];
+            const score = evalData?.reviewScore ?? null;
+            const scoreClass = getScoreClass(score);
+
             return (
-              <div key={skill.path} className="skill-item">
-                <div className="skill-info">
-                  <span className={`skill-badge ${evalData.className}`}>
-                    {evalData.icon}
-                  </span>
-                  <span className="skill-name" title={skill.name}>
-                    {truncateName(skill.name)}
-                  </span>
-                </div>
-                <span className={`skill-status ${evalData.className}`}>
-                  {evalData.hasEval ? formatLift(evalData.lift!) : 'no eval'}
+              <div
+                key={skill.path}
+                className={`skill-chip ${scoreClass}`}
+                onClick={() => openSkillPage(skill.name)}
+                title={`${skill.name}${score !== null ? ` • ${score}% review score` : ' • No eval'}`}
+              >
+                <span className="skill-chip-name">{skill.name}</span>
+                <span className={`skill-chip-score ${scoreClass}`}>
+                  {formatScore(score)}
                 </span>
               </div>
             );
@@ -81,14 +91,10 @@ export function SkillsPanel({ skills }: SkillsPanelProps) {
         )}
       </div>
 
-      <div className="tessl-link" onClick={openTesslRegistry}>
-        Free evals on tessl.io &rarr;
+      <div className="tessl-cta" onClick={openTesslRegistry}>
+        <span className="tessl-cta-text">Get evals on tessl.io</span>
+        <span className="tessl-cta-arrow">→</span>
       </div>
     </div>
   );
-}
-
-function truncateName(name: string, maxLength: number = 20): string {
-  if (name.length <= maxLength) return name;
-  return name.slice(0, maxLength - 3) + '...';
 }

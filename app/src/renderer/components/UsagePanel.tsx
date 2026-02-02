@@ -11,9 +11,7 @@ export function UsagePanel({ stats }: UsagePanelProps) {
       {/* 5-Hour Window */}
       <div className="usage-section">
         <div className="usage-header">
-          <span className="usage-label">
-            <span className="usage-icon">&#x23F1;</span> 5-Hour Window
-          </span>
+          <span className="usage-label">5-Hour Window</span>
           <span className="usage-value mono">{stats.fiveHourWindow.percentage}%</span>
         </div>
         <ProgressBar percentage={stats.fiveHourWindow.percentage} />
@@ -23,9 +21,7 @@ export function UsagePanel({ stats }: UsagePanelProps) {
       {/* Weekly Limit */}
       <div className="usage-section">
         <div className="usage-header">
-          <span className="usage-label">
-            <span className="usage-icon">&#x1F4C5;</span> Weekly
-          </span>
+          <span className="usage-label">Weekly</span>
           <span className="usage-value mono">{stats.weekly.percentage}%</span>
         </div>
         <ProgressBar percentage={stats.weekly.percentage} />
@@ -35,9 +31,7 @@ export function UsagePanel({ stats }: UsagePanelProps) {
       {/* Today's Stats */}
       <div className="usage-section today-section">
         <div className="usage-header">
-          <span className="usage-label">
-            <span className="usage-icon">&#x1F4CA;</span> Today
-          </span>
+          <span className="usage-label">Today</span>
         </div>
         <div className="today-stats">
           <div className="stat-row">

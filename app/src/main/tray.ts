@@ -4,8 +4,8 @@ import path from 'path';
 let tray: Tray | null = null;
 let window: BrowserWindow | null = null;
 
-const WINDOW_WIDTH = 320;
-const WINDOW_HEIGHT = 480;
+const WINDOW_WIDTH = 360;
+const WINDOW_HEIGHT = 520;
 
 export function getWindow(): BrowserWindow | null {
   return window;
@@ -24,7 +24,7 @@ function createWindow(): BrowserWindow {
     closable: true,
     alwaysOnTop: true,
     skipTaskbar: true,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0a0a0b',
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       nodeIntegration: false,
