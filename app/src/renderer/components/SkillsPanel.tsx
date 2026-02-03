@@ -8,19 +8,29 @@ interface SkillsPanelProps {
 interface SkillEval {
   skillName: string;
   reviewScore: number | null;
+  evalImprovement: number | null;
   hasEval: boolean;
   source: string | null;
 }
 
-function getScoreClass(score: number | null): string {
-  if (score === null) return 'no-eval';
-  if (score >= 70) return 'high';
-  if (score >= 50) return 'mid';
-  return 'low';
+// Color coding based on lift value (evalImprovement)
+function getLiftClass(lift: number | null): string {
+  if (lift === null) return 'no-eval';
+  if (lift >= 5) return 'positive';
+  if (lift >= 0) return 'neutral';
+  return 'negative';
 }
 
+// Format lift as signed number: +24.6 or -3.5
+function formatLift(lift: number | null): string {
+  if (lift === null) return '—';
+  const prefix = lift >= 0 ? '+' : '';
+  return `${prefix}${lift.toFixed(1)}`;
+}
+
+// Format review score as percentage
 function formatScore(score: number | null): string {
-  if (score === null) return '—';
+  if (score === null) return '';
   return `${Math.round(score)}%`;
 }
 
@@ -72,19 +82,33 @@ export function SkillsPanel({ skills }: SkillsPanelProps) {
           skills.map((skill) => {
             const evalData = evals[skill.name];
             const score = evalData?.reviewScore ?? null;
-            const scoreClass = getScoreClass(score);
+            const lift = evalData?.evalImprovement ?? null;
+            const liftClass = getLiftClass(lift);
+
+            // Build tooltip showing both metrics
+            const tooltipParts = [skill.name];
+            if (score !== null) tooltipParts.push(`${score}% quality`);
+            if (lift !== null) tooltipParts.push(`${formatLift(lift)} lift`);
+            else tooltipParts.push('No eval');
 
             return (
               <div
                 key={skill.path}
-                className={`skill-chip ${scoreClass}`}
+                className={`skill-chip ${liftClass}`}
                 onClick={() => openSkillPage(skill.name)}
-                title={`${skill.name}${score !== null ? ` • ${score}% review score` : ' • No eval'}`}
+                title={tooltipParts.join(' • ')}
               >
                 <span className="skill-chip-name">{skill.name}</span>
-                <span className={`skill-chip-score ${scoreClass}`}>
-                  {formatScore(score)}
-                </span>
+                <div className="skill-chip-metrics">
+                  {score !== null && (
+                    <span className="skill-chip-score no-eval">
+                      {formatScore(score)}
+                    </span>
+                  )}
+                  <span className={`skill-chip-lift ${liftClass}`}>
+                    {formatLift(lift)}
+                  </span>
+                </div>
               </div>
             );
           })
