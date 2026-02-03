@@ -76,7 +76,7 @@ export function SkillsPanel({ skills }: SkillsPanelProps) {
   return (
     <div className="skills-panel">
       <div className="skills-header">
-        <div className="skills-title-row">
+        <div className="skills-title-row" title="% = skill quality | +/- = performance lift">
           <span className="skills-label">SKILLS</span>
           <span className="skills-count">{skills.length}</span>
         </div>

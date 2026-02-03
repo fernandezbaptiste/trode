@@ -45,7 +45,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1 className="title">Claude Usage</h1>
+        <h1 className="title">Claude + Skills Usage</h1>
         <span className="badge">Pro</span>
       </header>
 
