@@ -12,6 +12,7 @@ interface InstalledSkill {
 interface SkillEval {
   skillName: string;
   reviewScore: number | null;
+  evalImprovement: number | null;
   hasEval: boolean;
   source: string | null;
 }
