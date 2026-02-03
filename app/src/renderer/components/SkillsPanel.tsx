@@ -21,6 +21,14 @@ function getLiftClass(lift: number | null): string {
   return 'negative';
 }
 
+// Color coding based on review score percentage
+function getScoreClass(score: number | null): string {
+  if (score === null) return 'no-eval';
+  if (score >= 80) return 'high';
+  if (score >= 60) return 'mid';
+  return 'low';
+}
+
 // Format lift as signed number: +24.6 or -3.5
 function formatLift(lift: number | null): string {
   if (lift === null) return '—';
@@ -84,24 +92,31 @@ export function SkillsPanel({ skills }: SkillsPanelProps) {
             const score = evalData?.reviewScore ?? null;
             const lift = evalData?.evalImprovement ?? null;
             const liftClass = getLiftClass(lift);
+            const scoreClass = getScoreClass(score);
 
-            // Build tooltip showing both metrics
-            const tooltipParts = [skill.name];
-            if (score !== null) tooltipParts.push(`${score}% quality`);
-            if (lift !== null) tooltipParts.push(`${formatLift(lift)} lift`);
-            else tooltipParts.push('No eval');
+            // Build tooltip explaining both metrics
+            const tooltipLines = [skill.name];
+            if (score !== null) {
+              tooltipLines.push(`${Math.round(score)}% Quality Score — how well the skill is written`);
+            }
+            if (lift !== null) {
+              const liftDesc = lift >= 0 ? 'improves' : 'hurts';
+              tooltipLines.push(`${formatLift(lift)} Lift — ${liftDesc} Claude's performance`);
+            } else {
+              tooltipLines.push('No evaluation data available');
+            }
 
             return (
               <div
                 key={skill.path}
                 className={`skill-chip ${liftClass}`}
                 onClick={() => openSkillPage(skill.name)}
-                title={tooltipParts.join(' • ')}
+                title={tooltipLines.join('\n')}
               >
                 <span className="skill-chip-name">{skill.name}</span>
                 <div className="skill-chip-metrics">
                   {score !== null && (
-                    <span className="skill-chip-score no-eval">
+                    <span className={`skill-chip-score ${scoreClass}`}>
                       {formatScore(score)}
                     </span>
                   )}
