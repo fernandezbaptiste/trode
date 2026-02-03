@@ -94,26 +94,16 @@ export function SkillsPanel({ skills }: SkillsPanelProps) {
             const liftClass = getLiftClass(lift);
             const scoreClass = getScoreClass(score);
 
-            // Build tooltip explaining both metrics
-            const tooltipLines = [skill.name];
-            if (score !== null) {
-              tooltipLines.push(`${Math.round(score)}% Quality Score — how well the skill is written`);
-            }
-            if (lift !== null) {
-              const liftDesc = lift >= 0 ? 'improves' : 'hurts';
-              tooltipLines.push(`${formatLift(lift)} Lift — ${liftDesc} Claude's performance`);
-            } else {
-              tooltipLines.push('No evaluation data available');
-            }
+            // Concise tooltip: "% = quality | +/- = performance"
+            const tooltip = '% = skill quality | +/- = performance lift';
 
             return (
               <div
                 key={skill.path}
                 className={`skill-chip ${liftClass}`}
                 onClick={() => openSkillPage(skill.name)}
-                title={tooltipLines.join('\n')}
               >
-                <span className="skill-chip-name">{skill.name}</span>
+                <span className="skill-chip-name" title={tooltip}>{skill.name}</span>
                 <div className="skill-chip-metrics">
                   {score !== null && (
                     <span className={`skill-chip-score ${scoreClass}`}>
